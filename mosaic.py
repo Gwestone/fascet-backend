@@ -9,6 +9,36 @@ import numpy as np
 from scipy.spatial import cKDTree
 import math
 
+# Generate some random points
+points = np.random.rand(int(2500), 2)
+
+# Create a KD-tree from the points
+# tree = cKDTree(points)
+
+# Find the index of the nearest neighbor to a given point
+# query_point = [0.5, 0.5]
+# distance, index = tree.query(query_point)
+
+# print(f"Index of the nearest neighbor to {query_point}: {index}")
+
+for i in range(0, len(points)):
+    points[i][0] = math.ceil(points[i][0] * 1920)
+    points[i][1] = math.ceil(points[i][1] * 1080)
+points = points.astype(int)
+
+assignments = {}
+
+tree = cKDTree(points)
+
+for y in range(0, 1080):
+    for x in range(0, 1920):
+        distance, index = tree.query([x, y])
+        if (not index in assignments):
+            assignments[index] = [(x, y)]
+        else:
+            assignments[index].append((x, y))
+
+
 def generate_mosaics(b64_string):
 
     # Decode the Base64 string to a NumPy array
@@ -18,36 +48,6 @@ def generate_mosaics(b64_string):
 
     img = cv2.resize(img, (1920, 1080), interpolation=cv2.INTER_AREA)
     # plt.imshow(img)
-
-    # Generate some random points
-    points = np.random.rand(int(2500), 2)
-
-    # Create a KD-tree from the points
-    # tree = cKDTree(points)
-
-    # Find the index of the nearest neighbor to a given point
-    # query_point = [0.5, 0.5]
-    # distance, index = tree.query(query_point)
-
-    # print(f"Index of the nearest neighbor to {query_point}: {index}")
-
-    for i in range(0, len(points)):
-        points[i][0] = math.ceil(points[i][0] * img.shape[1])
-        points[i][1] = math.ceil(points[i][1] * img.shape[0])
-    points = points.astype(int)
-
-    assignments = {}
-
-    tree = cKDTree(points)
-
-    for y in range(0, img.shape[0]):
-        for x in range(0, img.shape[1]):
-            distance, index = tree.query([x, y])
-            if (not index in assignments):
-                assignments[index] = [(x, y)]
-            else:
-                assignments[index].append((x, y))
-
 
 
     colors = {}
